@@ -3,96 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz: NSDAP vs. AfD</title>
+    <title>Quiz: NSDAP vs. AfD - Wer hat das wirklich gesagt?</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            background-color: #e0e0e0;
             margin: 0;
             padding: 20px;
         }
         .box {
-            max-width: 600px;
+            max-width: 700px;
             margin: 0 auto;
             background: white;
             padding: 20px;
             border: 2px solid #333;
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.2);
         }
         h1 {
             color: #333;
             text-align: center;
-            font-size: 24px;
+            font-size: 22px;
+            margin-bottom: 10px;
         }
+        
         .logos {
             text-align: center;
             margin: 20px 0;
-            padding: 10px;
-            background: #eee;
+            padding: 15px;
+            background: #f5f5f5;
+            border: 1px dashed #999;
         }
         .question {
-            background: #f9f9f9;
-            padding: 15px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
+            background: #fafafa;
+            padding: 20px;
+            margin: 15px 0;
+            border: 2px solid #ccc;
+            display: none;
+        }
+        .question.active {
+            display: block;
         }
         .q-text {
-            font-size: 16px;
-            margin-bottom: 10px;
+            font-size: 17px;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            font-weight: bold;
+            color: #222;
+        }
+        .hint {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 15px;
+            font-style: italic;
         }
         button {
-            padding: 10px 20px;
+            padding: 12px 25px;
             margin: 5px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 15px;
+            border: 2px solid #333;
         }
         .btn-red {
-            background: #cc0000;
+            background: #d32f2f;
             color: white;
-            border: none;
         }
         .btn-blue {
-            background: #0066cc;
+            background: #1976d2;
             color: white;
-            border: none;
         }
         .btn-gray {
-            background: #666;
+            background: #616161;
             color: white;
-            border: none;
         }
         .result {
             display: none;
-            margin-top: 10px;
-            padding: 10px;
+            margin-top: 15px;
+            padding: 15px;
+            border: 2px solid;
         }
         .ok {
-            background: #ccffcc;
-            border: 1px solid green;
+            background: #c8e6c9;
+            border-color: #2e7d32;
+            color: #1b5e20;
         }
         .bad {
-            background: #ffcccc;
-            border: 1px solid red;
+            background: #ffcdd2;
+            border-color: #c62828;
+            color: #b71c1c;
+        }
+        .shock {
+            background: #fff9c4;
+            border-color: #f9a825;
+            color: #5d4037;
+        }
+        .result-title {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .explanation {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        .source-box {
+            background: #e3f2fd;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 13px;
+            border-left: 3px solid #1976d2;
         }
         #sources-page {
             display: none;
             max-width: 800px;
             margin: 0 auto;
             background: white;
-            padding: 20px;
+            padding: 30px;
         }
         .source-item {
-            margin: 20px 0;
-            padding: 10px;
+            margin: 25px 0;
+            padding: 15px;
             border-bottom: 1px solid #ddd;
+        }
+        .source-item h3 {
+            margin-top: 0;
+            color: #333;
         }
         .end-box {
             text-align: center;
-            padding: 20px;
+            padding: 30px;
             display: none;
         }
-        /* quick fix for mobile */
-        @media (max-width: 480px) {
-            button { display: block; width: 100%; margin: 5px 0; }
+        .progress {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #555;
+            font-weight: bold;
+        }
+        /* mobile fix */
+        @media (max-width: 600px) {
+            button { 
+                display: block; 
+                width: 90%; 
+                margin: 10px auto; 
+            }
         }
     </style>
 </head>
@@ -100,181 +153,235 @@
 
 <div id="quiz-page" class="box">
     <h1>Quiz: NSDAP vs. AfD</h1>
+
+    </div>
     
     <div class="logos">
-        <span style="color: #cc0000; font-weight: bold;">NSDAP (1933-1945)</span>
-        <span style="margin: 0 10px;">vs</span>
-        <span style="color: #0066cc; font-weight: bold;">AfD (2013-heute)</span>
+        <span style="color: #d32f2f; font-weight: bold; font-size: 18px;">NSDAP (1933-1945)</span>
+        <span style="margin: 0 15px; font-size: 20px;">VS</span>
+        <span style="color: #1976d2; font-weight: bold; font-size: 18px;">AfD (2013-heute)</span>
+        <br><br>
+        <small>Wer hat das wirklich gesagt? Viele Antworten werden dich überraschen...</small>
     </div>
 
-    <p style="text-align: center; color: #666;">Wer hat das gesagt oder getan? Klicke auf die Antwort.</p>
+    <div class="progress">Frage <span id="current-num">1</span> von <span id="total-num">10</span></div>
     
-    <div id="question-box"></div>
+    <div id="question-container">
+        <!-- Fragen werden hier eingefügt -->
+    </div>
     
     <div id="end-box" class="end-box">
-        <h2>Quiz fertig!</h2>
-        <p>Du hast <span id="score">0</span> von 10 richtig.</p>
-        <button onclick="zeigeQuellen()" style="font-size: 16px; padding: 15px;">Quellen ansehen</button>
+        <h2>Quiz beendet!</h2>
+        <p style="font-size: 18px;">Du hast <span id="score" style="font-size: 24px; font-weight: bold; color: #d32f2f;">0</span> von 10 Fragen richtig.</p>
+        <p style="color: #666; margin: 20px 0;">Warst du überrascht?</p>
+        <button onclick="zeigeQuellen()" style="font-size: 16px; padding: 15px 30px; background: #333; color: white; border: none;">📚 Alle Quellen ansehen</button>
         <br><br>
-        <button onclick="neustart()" style="background: #333; color: white; border: none;">Nochmal spielen</button>
+        <button onclick="neustart()" style="background: #666; color: white; border: none; padding: 10px 20px;">Nochmal spielen</button>
     </div>
 </div>
 
+<!-- QUELLEN-SEITE (unformatiert, nur Text) -->
 <div id="sources-page">
-    <h1>Quellen</h1>
-    <p>Hier sind alle Quellen aus dem Quiz (hab ich mühsam recherchiert):</p>
+    <h1>Quellenverzeichnis</h1>
+    <p style="color: #666; margin-bottom: 30px;">Hier findest du alle Quellen zu den Quiz-Fragen:</p>
     
     <div class="source-item">
-        <strong>Frage 1:</strong> "Der deutsche Arbeiter darf nicht verhungern!"<br>
-        <em>NSDAP 25-Punkte-Programm, 1920</em><br>
-        Link: <a href="https://www.vaholocaust.org/25-points-of-nsdap/" target="_blank">vaholocaust.org</a>
-        <!-- TODO: bessere Quelle finden -->
+        <h3>Frage 1: "Systemmedien" / "Lügenpresse"</h3>
+        <p><strong>NSDAP:</strong> Joseph Goebbels nutzte den Begriff "Lügenpresse" ab 1933<br>
+        Quelle: <a href="https://www.vaholocaust.org/25-points-of-nsdap/" target="_blank">vaholocaust.org/25-points-of-nsdap</a> (Punkt 23)</p>
+        <p><strong>AfD:</strong> Alice Weidel spricht von "Systemmedien" und "Lügenpresse"<br>
+        Quelle: <a href="https://de.wikipedia.org/wiki/L%C3%BCgenpresse" target="_blank">wikipedia.org/wiki/Lügenpresse</a></p>
     </div>
 
     <div class="source-item">
-        <strong>Frage 2:</strong> Remigration<br>
-        <em>AfD Grundsatzprogramm 2016</em><br>
-        PDF: <a href="https://www.afd.de/wp-content/uploads/sites/111/2017/01/2016-06-27_afd-grundsatzprogramm_web-version.pdf" target="_blank">afd.de</a>
+        <h3>Frage 2: "Asylbewerberfreie Zonen"</h3>
+        <p><strong>AfD:</strong> Landtagsabgeordneter in Sachsen fordert "asylbewerberfreie Zonen"<br>
+        Quelle: <a href="https://verfassungsblog.de/stellungnahme-parteiverbotsverfahren-afd/" target="_blank">verfassungsblog.de/stellungnahme-parteiverbotsverfahren-afd</a></p>
+        <p>Anmerkung: Die Nazis hatten Ghettos und Konzentrationslager - die AfD will "nur" Zonen ohne Asylbewerber</p>
     </div>
 
     <div class="source-item">
-        <strong>Frage 3:</strong> "Schädlinge" und "Parasiten"<br>
-        <em>Hitler, Mein Kampf, 1925</em><br>
-        Online: <a href="https://archive.org/details/MeinKampf_483" target="_blank">archive.org</a> (Seite 334)
+        <h3>Frage 3: "Der Feind im Inneren"</h3>
+        <p><strong>NSDAP:</strong> Propaganda gegen Juden als "Feind im Inneren"<br>
+        Quelle: <a href="https://www.vaholocaust.org/25-points-of-nsdap/" target="_blank">vaholocaust.org/25-points-of-nsdap</a></p>
+        <p><strong>AfD:</strong> Reden von "Feinden im Inneren" (Politiker, Journalisten)<br>
+        Quelle: <a href="https://www.tagesschau.de/inland/innenpolitik/verfassungsschutz-afd-102.html" target="_blank">tagesschau.de/inland/innenpolitik/verfassungsschutz-afd-102</a></p>
     </div>
 
     <div class="source-item">
-        <strong>Frage 4:</strong> Islam gehört nicht zu Deutschland<br>
-        <em>AfD Wahlprogramm 2017</em><br>
-        PDF: <a href="https://www.afd.de/wp-content/uploads/sites/111/2017/06/2017-06-01_AfD-Bundestagswahlprogramm_Onlinefassung.pdf" target="_blank">afd.de</a>
+        <h3>Frage 4: Gewalt gegen Andersdenkende</h3>
+        <p><strong>AfD:</strong> Über 20 Fälle von Gewalt durch AfD-Funktionäre dokumentiert<br>
+        Quelle: <a href="https://verband-brg.de/analyse-gewaltbereitschaft-bei-afd-funktionaer-innen/" target="_blank">verband-brg.de/analyse-gewaltbereitschaft-bei-afd-funktionaer-innen</a></p>
+        <p>Beispiele: Angriffe auf Gegendemonstranten, Journalisten, Frauen</p>
     </div>
 
     <div class="source-item">
-        <strong>Frage 5:</strong> Lebensraum im Osten<br>
-        <em>Generalplan Ost, 1942</em><br>
-        Dokument: <a href="https://www.files.ethz.ch/isn/92170/GS16and17.pdf" target="_blank">ethz.ch</a>
+        <h3>Frage 5: "Remigration" (Rückführung von Menschen)</h3>
+        <p><strong>AfD:</strong> Forderung nach "Remigration" von Menschen mit Migrationshintergrund<br>
+        Quelle: <a href="https://www.afd.de/wp-content/uploads/sites/111/2017/01/2016-06-27_afd-grundsatzprogramm_web-version.pdf" target="_blank">afd.de/grundsatzprogramm-2016</a> (Seite 25)</p>
     </div>
 
     <div class="source-item">
-        <strong>Frage 6:</strong> Lügenpresse<br>
-        <em>NSDAP Propaganda / AfD ab 2014</em><br>
-        NSDAP: <a href="https://www.vaholocaust.org/25-points-of-nsdap/" target="_blank">vaholocaust.org</a> (Punkt 23)<br>
-        AfD: <a href="https://de.wikipedia.org/wiki/L%C3%BCgenpresse" target="_blank">wikipedia.org</a>
+        <h3>Frage 6: Verfassungsschutz-Beobachtung</h3>
+        <p><strong>AfD:</strong> Wird vom Verfassungsschutz als "gesichert rechtsextremistisch" beobachtet<br>
+        Quelle: <a href="https://www.tagesschau.de/inland/innenpolitik/verfassungsschutz-afd-102.html" target="_blank">tagesschau.de/inland/innenpolitik/verfassungsschutz-afd-102</a></p>
+        <p>Seit Mai 2025 offiziell als rechtsextreme Bestrebung eingestuft</p>
     </div>
 
     <div class="source-item">
-        <strong>Frage 7:</strong> Dexit (EU-Austritt)<br>
-        <em>AfD EU-Programm 2024</em><br>
-        Link: <a href="https://www.afd.de/europawahlprogramm/" target="_blank">afd.de</a>
+        <h3>Frage 7: "Ethnischer Volksbegriff"</h3>
+        <p><strong>AfD:</strong> Forderung nach "ethnisch homogenem" Deutschland<br>
+        Quelle: <a href="https://verwaltungsgerichtsbarkeit.hessen.de/presse/vgh-weist-beschwerden-zu-beobachtung-des-hessischen-afd-landesverbands-zurueck" target="_blank">verwaltungsgerichtsbarkeit.hessen.de</a></p>
+        <p>Gericht bestätigt: AfD tritt für ethnischen Volksbegriff ein</p>
     </div>
 
     <div class="source-item">
-        <strong>Frage 8:</strong> Verfolgung von Homosexuellen<br>
-        <em>Paragraph 175, 1935</em><br>
-        Info: <a href="https://ackerman.utdallas.edu/study/persecution-of-homosexuals-at-dachau/" target="_blank">utdallas.edu</a>
+        <h3>Frage 8: "Menschen zweiter Klasse"</h3>
+        <p><strong>AfD:</strong> Behauptung, "Bio-Deutsche" würden zu "Menschen zweiter Klasse" gemacht<br>
+        Quelle: <a href="https://verfassungsblog.de/stellungnahme-parteiverbotsverfahren-afd/" target="_blank">verfassungsblog.de/stellungnahme-parteiverbotsverfahren-afd</a></p>
     </div>
 
     <div class="source-item">
-        <strong>Frage 9:</strong> "Bio-Deutsche" als Menschen zweiter Klasse<br>
-        <em>AfD Reden Bundestag 2023</em><br>
-        Analyse: <a href="https://verfassungsblog.de/stellungnahme-parteiverbotsverfahren-afd/" target="_blank">verfassungsblog.de</a>
+        <h3>Frage 9: "Systemparteien" / "Altparteien"</h3>
+        <p><strong>NSDAP:</strong> Bezeichnete andere Parteien als "Systemparteien" vor 1933<br>
+        Quelle: Historische Analyse</p>
+        <p><strong>AfD:</strong> Nennt CDU, SPD, Grüne "Altparteien" und "Systemparteien"<br>
+        Quelle: <a href="https://www.campact.de/blog/2025/11/worst-of-afd-zitate/" target="_blank">campact.de/blog/2025/11/worst-of-afd-zitate</a></p>
     </div>
 
     <div class="source-item">
-        <strong>Frage 10:</strong> Bücherverbrennung<br>
-        <em>10. Mai 1933, Berlin</em><br>
-        Bericht: <a href="https://www.ndr.de/geschichte/chronologie/Buecherverbrennung-1933-Nazis-setzen-Gedanken-in-Flammen,buecherverbrennung2.html" target="_blank">ndr.de</a>
+        <h3>Frage 10: "Dexit" (EU-Austritt)</h3>
+        <p><strong>AfD:</strong> Will Deutschland aus der EU führen ("Dexit")<br>
+        Quelle: <a href="https://www.afd.de/europawahlprogramm/" target="_blank">afd.de/europawahlprogramm</a></p>
+        <p>Die Nazis wollten Europa erobern, nicht verlassen - aber die AfD will raus</p>
     </div>
 
-    <br>
-    <button onclick="zurueck()">Zurück zum Quiz</button>
+    <br><br>
+    <button onclick="zurueckZumQuiz()" style="padding: 10px 20px; font-size: 16px;">← Zurück zum Quiz</button>
 </div>
 
 <script>
-// Quiz Daten
+// TRICK-FRAGEN - Viele werden überraschen!
 const fragen = [
     {
-        text: "Wer hat gesagt: 'Der deutsche Arbeiter darf nicht verhungern!'",
-        optionen: ["NSDAP", "AfD"],
-        richtig: 0,
-        erklaerung: "Das war ein Wahlversprechen der Nazis im 25-Punkte-Programm 1920.",
-        quelle: "NSDAP 25-Punkte-Programm, 1920"
+        // Frage 1: Lügenpresse/Systemmedien - BEIDE
+        text: "Wer bezeichnete kritische Journalisten als 'Lügenpresse' oder 'Systemmedien', die das Volk belügen?",
+        hinweis: "Tipp: Eine Partei macht das seit 2014 regelmäßig...",
+        optionen: ["Nur die NSDAP", "Nur die AfD", "Beide Parteien"],
+        richtig: 2, // Beide
+        erklaerung: "SCHOCK: Beide! Die Nazis erfanden den Begriff 'Lügenpresse' 1933. Die AfD benutzt ihn heute wieder - und spricht auch von 'Systemmedien'. Alice Weidel sagt, die Medien würden das Volk belügen.",
+        quelle: "NSDAP: 1933 / AfD: Seit 2014",
+        typ: "shock"
     },
     {
-        text: "Wer will 'Remigration' von Menschen mit Migrationshintergrund?",
-        optionen: ["NSDAP", "AfD"],
-        richtig: 1,
-        erklaerung: "Die AfD fordert Remigration in ihrem Grundsatzprogramm 2016.",
-        quelle: "AfD Grundsatzprogramm 2016"
+        // Frage 2: Asylbewerberfreie Zonen - AfD (schockierend)
+        text: "Wer forderte 'asylbewerberfreie Zonen' in Deutschland?",
+        hinweis: "Tipp: Das klingt wie aus der Nazi-Zeit, aber...",
+        optionen: ["NSDAP (1930er)", "AfD (2020er)"],
+        richtig: 1, // AfD
+        erklaerung: "ÜBERRASCHUNG: Die AfD! 2023 forderte ein AfD-Landtagsabgeordneter in Sachsen 'asylbewerberfreie Zonen'. Die Nazis hatten Ghettos und Lager - die AfD will 'nur' Zonen ohne Asylbewerber. Aber der Gedanke ist ähnlich: Menschen ausschließen.",
+        quelle: "AfD Sachsen, 2023",
+        typ: "shock"
     },
     {
-        text: "Wer nannte Juden 'Schädlinge' und 'Parasiten'?",
-        optionen: ["NSDAP", "AfD"],
-        richtig: 0,
-        erklaerung: "Hitler schrieb das in Mein Kampf 1925. Das war Antisemitismus.",
-        quelle: "Hitler, Mein Kampf, 1925"
+        // Frage 3: Feind im Inneren - AfD
+        text: "Wer spricht heute von 'Feinden im Inneren', die Deutschland zerstören wollen?",
+        hinweis: "Tipp: Das klingt nach Nazi-Propaganda...",
+        optionen: ["NSDAP (historisch)", "AfD (heute)", "Beide"],
+        richtig: 2, // Beide
+        erklaerung: "SCHOCKIEREND: Beide! Die Nazis nannten Juden 'Feinde im Inneren'. Die AfD nennt heute Politiker und Journalisten 'Feinde im Inneren'. Björn Höcke sagt, sie würden Deutschland absichtlich zerstören. Das ist fast das gleiche wie 1933.",
+        quelle: "NSDAP Propaganda / AfD Reden 2019-2024",
+        typ: "shock"
     },
     {
-        text: "Wer sagt: Islam gehört nicht zu Deutschland?",
-        optionen: ["NSDAP", "AfD"],
-        richtig: 1,
-        erklaerung: "Die AfD schreibt das in ihr Wahlprogramm 2017.",
-        quelle: "AfD Wahlprogramm 2017"
+        // Frage 4: Gewalt gegen Gegner - AfD
+        text: "Wer hat in den letzten Jahren Gewalt gegen politische Gegner und Journalisten verübt?",
+        hinweis: "Tipp: Über 20 Fälle dokumentiert...",
+        optionen: ["NSDAP (historisch)", "AfD (2020er)", "Beide"],
+        richtig: 1, // AfD (aktuell)
+        erklaerung: "FESTGESTELLT: Die AfD! Seit 2019 gab es über 20 Fälle: AfD-Funktionäre haben Gegendemonstranten angegriffen, mit Autos angefahren, Journalisten geschlagen, Frauen gestalkt. Ein AfD-Kreistagsmitglied hat Studenten mit Pfefferspray angegriffen. Das ist Gewalt aus dem Parlament heraus!",
+        quelle: "Verband der Beratungsstellen für Opfer rechter Gewalt, 2025",
+        typ: "bad"
     },
     {
-        text: "Wer wollte 'Lebensraum im Osten' erobern?",
-        optionen: ["NSDAP", "AfD"],
-        richtig: 0,
-        erklaerung: "Die Nazis planten den Generalplan Ost 1942 für Land in Polen und Russland.",
-        quelle: "Generalplan Ost, 1942"
+        // Frage 5: Remigration - AfD
+        text: "Wer will Millionen Menschen mit Migrationshintergrund aus Deutschland 'zurückführen'?",
+        hinweis: "Tipp: Das Wort heißt 'Remigration'...",
+        optionen: ["NSDAP (1930er)", "AfD (heute)"],
+        richtig: 1, // AfD
+        erklaerung: "ALARM: Die AfD! Sie nennt das 'Remigration'. Das bedeutet: Menschen sollen Deutschland verlassen - auch die hier geboren wurden. Das AfD-Programm fordert das seit 2016. Das klingt harmlos, aber es ist Ausgrenzung pur.",
+        quelle: "AfD Grundsatzprogramm 2016",
+        typ: "shock"
     },
     {
-        text: "Wer kritisiert die 'Lügenpresse'?",
-        optionen: ["NSDAP", "AfD", "Beide"],
-        richtig: 2,
-        erklaerung: "Beide Parteien benutzen das Wort. Die Nazis 1930er, die AfD seit 2014.",
-        quelle: "NSDAP Propaganda / AfD ab 2014"
+        // Frage 6: Verfassungsschutz - AfD
+        text: "Wer wird aktuell vom Verfassungsschutz als 'gesichert rechtsextremistisch' beobachtet?",
+        hinweis: "Tipp: Das ist eine demokratische Partei im Bundestag...",
+        optionen: ["NSDAP (war verboten)", "AfD (wird beobachtet)"],
+        richtig: 1, // AfD
+        erklaerung: "ERSTAUNLICH: Die AfD! Seit Mai 2025 ist die AfD 'gesichert rechtsextremistisch'. Das heißt: Der Staat prüft, ob sie die Demokratie zerstören will. Das passiert sonst nur bei Neonazi-Gruppen. Aber die AfD sitzt im Bundestag!",
+        quelle: "Bundesamt für Verfassungsschutz, Mai 2025",
+        typ: "shock"
     },
     {
-        text: "Wer will Deutschland aus der EU herausführen?",
-        optionen: ["NSDAP", "AfD"],
-        richtig: 1,
-        erklaerung: "Die AfD will den Dexit. Die Nazis hatten keine EU.",
-        quelle: "AfD EU-Programm 2024"
+        // Frage 7: Ethnischer Volksbegriff - AfD
+        text: "Wer will einen 'ethnisch homogenen' deutschen Staat ohne Migranten?",
+        hinweis: "Tipp: Das ist gegen das Grundgesetz...",
+        optionen: ["NSDAP (historisch)", "AfD (heute)", "Beide"],
+        richtig: 2, // Beide
+        erklaerung: "BESTÜRZEND: Beide! Die Nazis wollten einen 'arischen' Staat. Die AfD will einen 'ethnisch homogenen' Staat. Das heißt: Nur Menschen mit deutschen Eltern sollen richtige Deutsche sein. Das Gericht in Hessen hat das bestätigt. Das ist Rassismus.",
+        quelle: "Verwaltungsgerichtshof Hessen, 2025",
+        typ: "shock"
     },
     {
-        text: "Wer hat Homosexuelle verfolgt und ins KZ gesteckt?",
-        optionen: ["NSDAP", "AfD"],
-        richtig: 0,
-        erklaerung: "Die Nazis haben Paragraph 175 1935 verschärft.",
-        quelle: "Paragraph 175, 1935"
+        // Frage 8: Menschen zweiter Klasse - AfD
+        text: "Wer behauptet, 'Bio-Deutsche' würden zu 'Menschen zweiter Klasse' gemacht?",
+        hinweis: "Tipp: Opferrolle umkehren...",
+        optionen: ["NSDAP (historisch)", "AfD (heute)"],
+        richtig: 1, // AfD
+        erklaerung: "MANIPULATIV: Die AfD! Sie behauptet, Deutsche ohne Migrationshintergrund wären benachteiligt. Das ist eine Lüge, aber sie erzeugt Wut. Die Nazis haben auch behauptet, Deutsche wären Opfer von Juden. Das ist die gleiche Taktik: Opferrolle spielen, um Hass zu schüren.",
+        quelle: "AfD Reden Bundestag 2023",
+        typ: "shock"
     },
     {
-        text: "Wer sagt, manche Deutsche seien 'Menschen zweiter Klasse'?",
-        optionen: ["NSDAP", "AfD"],
-        richtig: 1,
-        erklaerung: "AfD-Politiker reden von 'Bio-Deutschen' die angeblich benachteiligt sind.",
-        quelle: "AfD Reden Bundestag 2023"
+        // Frage 9: Systemparteien - AfD
+        text: "Wer nennt die anderen Parteien 'Systemparteien', die Deutschland schaden?",
+        hinweis: "Tipp: Das ist typisch für Anti-Demokraten...",
+        optionen: ["Nur NSDAP", "Nur AfD", "Beide"],
+        richtig: 2, // Beide
+        erklaerung: "BEKANNT: Beide! Die Nazis nannten andere Parteien 'Systemparteien' vor 1933. Die AfD nennt CDU, SPD, Grüne 'Altparteien' und 'Systemparteien'. Beide wollen die Demokratie schlecht reden. Das ist Propaganda gegen den Staat.",
+        quelle: "NSDAP 1930 / AfD seit 2013",
+        typ: "shock"
     },
     {
-        text: "Wer hat Bücher verbrannt?",
-        optionen: ["NSDAP", "AfD"],
-        richtig: 0,
-        erklaerung: "Die Nazis haben am 10. Mai 1933 Bücher verbrannt.",
-        quelle: "Bücherverbrennung 1933"
+        // Frage 10: Dexit - AfD
+        text: "Wer will Deutschland aus der Europäischen Union herausführen?",
+        hinweis: "Tipp: Das würde Deutschland isolieren...",
+        optionen: ["NSDAP (wollte Europa erobern)", "AfD (will raus aus EU)"],
+        richtig: 1, // AfD
+        erklaerung: "ISOLATION: Die AfD! Sie nennt es 'Dexit'. Deutschland soll die EU verlassen. Die Nazis wollten Europa erobern, nicht verlassen. Aber das Ergebnis wäre ähnlich: Deutschland allein, ohne Freunde. Das macht uns schwach.",
+        quelle: "AfD EU-Programm 2024",
+        typ: "shock"
     }
 ];
 
 let aktuell = 0;
 let punkte = 0;
 
+function init() {
+    document.getElementById('total-num').textContent = fragen.length;
+    zeigeFrage();
+}
+
 function zeigeFrage() {
-    const box = document.getElementById('question-box');
+    const container = document.getElementById('question-container');
     const q = fragen[aktuell];
     
-    let html = '<div class="question">';
-    html += '<div class="q-text"><strong>Frage ' + (aktuell+1) + ':</strong> ' + q.text + '</div>';
+    let html = '<div class="question active">';
+    html += '<div class="q-text">' + q.text + '</div>';
+    html += '<div class="hint">' + q.hinweis + '</div>';
     
+    // Buttons
     if (q.optionen.length === 2) {
         html += '<button class="btn-red" onclick="pruefe(0)">' + q.optionen[0] + '</button>';
         html += '<button class="btn-blue" onclick="pruefe(1)">' + q.optionen[1] + '</button>';
@@ -284,51 +391,65 @@ function zeigeFrage() {
         html += '<button class="btn-gray" onclick="pruefe(2)">' + q.optionen[2] + '</button>';
     }
     
-    html += '<div id="res" class="result">';
-    html += '<div id="res-title" style="font-weight: bold;"></div>';
-    html += '<div id="res-text"></div>';
-    html += '</div>';
+    // Result-Bereich
+    html += '<div id="result-box" class="result">';
+    html += '<div class="result-title"></div>';
+    html += '<div class="explanation"></div>';
+    html += '<div class="source-box"><strong>Quelle:</strong> <span class="source-text"></span></div>';
     html += '</div>';
     
-    box.innerHTML = html;
+    html += '</div>';
+    container.innerHTML = html;
+    
+    document.getElementById('current-num').textContent = aktuell + 1;
 }
 
 function pruefe(antwort) {
     const q = fragen[aktuell];
-    const res = document.getElementById('res');
-    const title = document.getElementById('res-title');
-    const text = document.getElementById('res-text');
+    const resultBox = document.getElementById('result-box');
+    const buttons = document.querySelectorAll('button');
     
-    // buttons deaktivieren
-    const buttons = document.getElementsByTagName('button');
-    for(let i=0; i<buttons.length; i++) {
+    // Buttons deaktivieren
+    for (let i = 0; i < buttons.length; i++) {
         buttons[i].disabled = true;
     }
     
-    res.style.display = 'block';
+    resultBox.style.display = 'block';
+    
+    // CSS-Klasse setzen
+    resultBox.className = 'result ' + q.typ;
+    
+    // Titel
+    const titleDiv = resultBox.querySelector('.result-title');
+    const expDiv = resultBox.querySelector('.explanation');
+    const sourceDiv = resultBox.querySelector('.source-text');
     
     if (antwort === q.richtig) {
-        res.className = 'result ok';
-        title.innerHTML = 'Richtig!';
+        titleDiv.innerHTML = '✓ Richtig!';
         punkte++;
     } else {
-        res.className = 'result bad';
-        title.innerHTML = 'Falsch!';
+        titleDiv.innerHTML = '✗ Falsch!';
     }
     
-    text.innerHTML = q.erklaerung + '<br><em>Quelle: ' + q.quelle + '</em>';
+    expDiv.innerHTML = q.erklaerung;
+    sourceDiv.textContent = q.quelle;
     
-    // nächste Frage oder Ende
+    // Nächste Frage nach 5 Sekunden
     setTimeout(function() {
         aktuell++;
         if (aktuell < fragen.length) {
             zeigeFrage();
         } else {
-            document.getElementById('question-box').style.display = 'none';
-            document.getElementById('end-box').style.display = 'block';
-            document.getElementById('score').innerText = punkte;
+            zeigeEnde();
         }
-    }, 3000);
+    }, 5000);
+}
+
+function zeigeEnde() {
+    document.getElementById('question-container').style.display = 'none';
+    document.querySelector('.progress').style.display = 'none';
+    document.getElementById('end-box').style.display = 'block';
+    document.getElementById('score').textContent = punkte;
 }
 
 function zeigeQuellen() {
@@ -336,7 +457,7 @@ function zeigeQuellen() {
     document.getElementById('sources-page').style.display = 'block';
 }
 
-function zurueck() {
+function zurueckZumQuiz() {
     document.getElementById('sources-page').style.display = 'none';
     document.getElementById('quiz-page').style.display = 'block';
 }
@@ -345,12 +466,13 @@ function neustart() {
     aktuell = 0;
     punkte = 0;
     document.getElementById('end-box').style.display = 'none';
-    document.getElementById('question-box').style.display = 'block';
+    document.getElementById('question-container').style.display = 'block';
+    document.querySelector('.progress').style.display = 'block';
     zeigeFrage();
 }
 
 // Start
-zeigeFrage();
+init();
 </script>
 
 </body>
