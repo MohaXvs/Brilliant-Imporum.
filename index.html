@@ -1,133 +1,357 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Enes & Mohammad's Brilliant Imporium</title>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Libertinus+Serif+Display&display=swap" rel="stylesheet">
-
-<style>
-body{
-font-family: "Libertinus Serif Display", system-ui;
-font-weight: 400;
-font-style: normal;
-background-color: rgb(212, 212, 212);
-padding-left: 50px;
-padding-right: 650px;
-}
-.header.image {
-width: 100%;
-height:100px;
-object-fit: cover;
-object-position: top 100% 100%;
-display: block;
-}
-.headline{
-color: rgb(0, 0, 0);
-}
-.image-container{
-background-color: rgb(255, 255, 255);
-padding: 16px;
-}
-.navbar{
-display: flex;
-justify-content: space-between;
-align-items: center;
-}
-a{
-color: purple;
-text-decoration: none;
-margin-left: 4px;
-font-weight: bold;
-font-size: 24px;
-}
-a:hover {
-text-decoration: underline;
-}
-.text-highlight {
-color: purple;
-font-size: 48px;
-}
-
-.text-container {
-background-color: rgb(212, 212, 212);
-padding: 8px;
-color: purple;
-font-size: 24px;
-font-weight: 600;
-}
-.maps-container {
-margin-top: 16px;
-display: flex;
-justify-content: space-between;
-flex-wrap: wrap; 
-}
-.maps-right{
-margin-left: 16px;
-width: 50%;
-}
-
-img, iframe {
-max-width: 100%;
-height: auto;
-}
-@media (max-width: 768px) {
-body {
-padding-right: 20px;
-padding-left: 20px;
-}
-.navbar {
-flex-direction: column;
-align-items: flex-start;
-}
-.maps-right {
-width: 100%;
-margin-left: 0;
-margin-top: 16px;
-}
-.legal-content{
-padding: 8px;     
-}
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: NSDAP vs. AfD</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        .box {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border: 2px solid #333;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            font-size: 24px;
+        }
+        .logos {
+            text-align: center;
+            margin: 20px 0;
+            padding: 10px;
+            background: #eee;
+        }
+        .question {
+            background: #f9f9f9;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+        }
+        .q-text {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-red {
+            background: #cc0000;
+            color: white;
+            border: none;
+        }
+        .btn-blue {
+            background: #0066cc;
+            color: white;
+            border: none;
+        }
+        .btn-gray {
+            background: #666;
+            color: white;
+            border: none;
+        }
+        .result {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+        }
+        .ok {
+            background: #ccffcc;
+            border: 1px solid green;
+        }
+        .bad {
+            background: #ffcccc;
+            border: 1px solid red;
+        }
+        #sources-page {
+            display: none;
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+        }
+        .source-item {
+            margin: 20px 0;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .end-box {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+        /* quick fix for mobile */
+        @media (max-width: 480px) {
+            button { display: block; width: 100%; margin: 5px 0; }
+        }
+    </style>
 </head>
 <body>
-<div class="navbar">
-<h1 class="headline">
-Enes & Mohammads<br> <span class="text-highlight">Brilliant Imporium</span>
-</h1>
-<div>
 
-<a href="#" target="_blank" rel="noopener noreferrer">Informations</a>
-<a href="#" target="_blank" rel="noopener noreferrer">Products</a>
-<a href="#" target="_blank" rel="noopener noreferrer">Subscribtions/Discounts</a>
-<a href="#" target="_blank" rel="noopener noreferrer">Contact</a>
+<div id="quiz-page" class="box">
+    <h1>Quiz: NSDAP vs. AfD</h1>
+    
+    <div class="logos">
+        <span style="color: #cc0000; font-weight: bold;">NSDAP (1933-1945)</span>
+        <span style="margin: 0 10px;">vs</span>
+        <span style="color: #0066cc; font-weight: bold;">AfD (2013-heute)</span>
+    </div>
+
+    <p style="text-align: center; color: #666;">Wer hat das gesagt oder getan? Klicke auf die Antwort.</p>
+    
+    <div id="question-box"></div>
+    
+    <div id="end-box" class="end-box">
+        <h2>Quiz fertig!</h2>
+        <p>Du hast <span id="score">0</span> von 10 richtig.</p>
+        <button onclick="zeigeQuellen()" style="font-size: 16px; padding: 15px;">Quellen ansehen</button>
+        <br><br>
+        <button onclick="neustart()" style="background: #333; color: white; border: none;">Nochmal spielen</button>
+    </div>
 </div>
+
+<div id="sources-page">
+    <h1>Quellen</h1>
+    <p>Hier sind alle Quellen aus dem Quiz (hab ich mühsam recherchiert):</p>
+    
+    <div class="source-item">
+        <strong>Frage 1:</strong> "Der deutsche Arbeiter darf nicht verhungern!"<br>
+        <em>NSDAP 25-Punkte-Programm, 1920</em><br>
+        Link: <a href="https://www.vaholocaust.org/25-points-of-nsdap/" target="_blank">vaholocaust.org</a>
+        <!-- TODO: bessere Quelle finden -->
+    </div>
+
+    <div class="source-item">
+        <strong>Frage 2:</strong> Remigration<br>
+        <em>AfD Grundsatzprogramm 2016</em><br>
+        PDF: <a href="https://www.afd.de/wp-content/uploads/sites/111/2017/01/2016-06-27_afd-grundsatzprogramm_web-version.pdf" target="_blank">afd.de</a>
+    </div>
+
+    <div class="source-item">
+        <strong>Frage 3:</strong> "Schädlinge" und "Parasiten"<br>
+        <em>Hitler, Mein Kampf, 1925</em><br>
+        Online: <a href="https://archive.org/details/MeinKampf_483" target="_blank">archive.org</a> (Seite 334)
+    </div>
+
+    <div class="source-item">
+        <strong>Frage 4:</strong> Islam gehört nicht zu Deutschland<br>
+        <em>AfD Wahlprogramm 2017</em><br>
+        PDF: <a href="https://www.afd.de/wp-content/uploads/sites/111/2017/06/2017-06-01_AfD-Bundestagswahlprogramm_Onlinefassung.pdf" target="_blank">afd.de</a>
+    </div>
+
+    <div class="source-item">
+        <strong>Frage 5:</strong> Lebensraum im Osten<br>
+        <em>Generalplan Ost, 1942</em><br>
+        Dokument: <a href="https://www.files.ethz.ch/isn/92170/GS16and17.pdf" target="_blank">ethz.ch</a>
+    </div>
+
+    <div class="source-item">
+        <strong>Frage 6:</strong> Lügenpresse<br>
+        <em>NSDAP Propaganda / AfD ab 2014</em><br>
+        NSDAP: <a href="https://www.vaholocaust.org/25-points-of-nsdap/" target="_blank">vaholocaust.org</a> (Punkt 23)<br>
+        AfD: <a href="https://de.wikipedia.org/wiki/L%C3%BCgenpresse" target="_blank">wikipedia.org</a>
+    </div>
+
+    <div class="source-item">
+        <strong>Frage 7:</strong> Dexit (EU-Austritt)<br>
+        <em>AfD EU-Programm 2024</em><br>
+        Link: <a href="https://www.afd.de/europawahlprogramm/" target="_blank">afd.de</a>
+    </div>
+
+    <div class="source-item">
+        <strong>Frage 8:</strong> Verfolgung von Homosexuellen<br>
+        <em>Paragraph 175, 1935</em><br>
+        Info: <a href="https://ackerman.utdallas.edu/study/persecution-of-homosexuals-at-dachau/" target="_blank">utdallas.edu</a>
+    </div>
+
+    <div class="source-item">
+        <strong>Frage 9:</strong> "Bio-Deutsche" als Menschen zweiter Klasse<br>
+        <em>AfD Reden Bundestag 2023</em><br>
+        Analyse: <a href="https://verfassungsblog.de/stellungnahme-parteiverbotsverfahren-afd/" target="_blank">verfassungsblog.de</a>
+    </div>
+
+    <div class="source-item">
+        <strong>Frage 10:</strong> Bücherverbrennung<br>
+        <em>10. Mai 1933, Berlin</em><br>
+        Bericht: <a href="https://www.ndr.de/geschichte/chronologie/Buecherverbrennung-1933-Nazis-setzen-Gedanken-in-Flammen,buecherverbrennung2.html" target="_blank">ndr.de</a>
+    </div>
+
+    <br>
+    <button onclick="zurueck()">Zurück zum Quiz</button>
 </div>
-<div class="image-container">
-<img class="header-image" src="header.jpg">
-<div class="text-container">
-Individual Clothing Customization Apply in 5 Minutes
-</div>
-<div class="maps-container">
-<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2975.387116624885!2d-87.6163077!3d41.776870100000004!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x880e292aeba9f359%3A0x95c425cf4ac95d8e!2sParkway%20Gardens%20Apartments!5e0!3m2!1sde!2sde!4v1760949858498!5m2!1sde!2sde" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-<div class="text-container maps-right">
-You don't wanna walk in a bad fit in Chicago. ~ King Von
-</div>
-</div>
-</div>
-<div class="legal-content">
-     (c) 1987 O-Block Company GmbH <a href="#"> Impressum</a> | <a href="#">Datenschutz</a>
-</div>
+
+<script>
+// Quiz Daten
+const fragen = [
+    {
+        text: "Wer hat gesagt: 'Der deutsche Arbeiter darf nicht verhungern!'",
+        optionen: ["NSDAP", "AfD"],
+        richtig: 0,
+        erklaerung: "Das war ein Wahlversprechen der Nazis im 25-Punkte-Programm 1920.",
+        quelle: "NSDAP 25-Punkte-Programm, 1920"
+    },
+    {
+        text: "Wer will 'Remigration' von Menschen mit Migrationshintergrund?",
+        optionen: ["NSDAP", "AfD"],
+        richtig: 1,
+        erklaerung: "Die AfD fordert Remigration in ihrem Grundsatzprogramm 2016.",
+        quelle: "AfD Grundsatzprogramm 2016"
+    },
+    {
+        text: "Wer nannte Juden 'Schädlinge' und 'Parasiten'?",
+        optionen: ["NSDAP", "AfD"],
+        richtig: 0,
+        erklaerung: "Hitler schrieb das in Mein Kampf 1925. Das war Antisemitismus.",
+        quelle: "Hitler, Mein Kampf, 1925"
+    },
+    {
+        text: "Wer sagt: Islam gehört nicht zu Deutschland?",
+        optionen: ["NSDAP", "AfD"],
+        richtig: 1,
+        erklaerung: "Die AfD schreibt das in ihr Wahlprogramm 2017.",
+        quelle: "AfD Wahlprogramm 2017"
+    },
+    {
+        text: "Wer wollte 'Lebensraum im Osten' erobern?",
+        optionen: ["NSDAP", "AfD"],
+        richtig: 0,
+        erklaerung: "Die Nazis planten den Generalplan Ost 1942 für Land in Polen und Russland.",
+        quelle: "Generalplan Ost, 1942"
+    },
+    {
+        text: "Wer kritisiert die 'Lügenpresse'?",
+        optionen: ["NSDAP", "AfD", "Beide"],
+        richtig: 2,
+        erklaerung: "Beide Parteien benutzen das Wort. Die Nazis 1930er, die AfD seit 2014.",
+        quelle: "NSDAP Propaganda / AfD ab 2014"
+    },
+    {
+        text: "Wer will Deutschland aus der EU herausführen?",
+        optionen: ["NSDAP", "AfD"],
+        richtig: 1,
+        erklaerung: "Die AfD will den Dexit. Die Nazis hatten keine EU.",
+        quelle: "AfD EU-Programm 2024"
+    },
+    {
+        text: "Wer hat Homosexuelle verfolgt und ins KZ gesteckt?",
+        optionen: ["NSDAP", "AfD"],
+        richtig: 0,
+        erklaerung: "Die Nazis haben Paragraph 175 1935 verschärft.",
+        quelle: "Paragraph 175, 1935"
+    },
+    {
+        text: "Wer sagt, manche Deutsche seien 'Menschen zweiter Klasse'?",
+        optionen: ["NSDAP", "AfD"],
+        richtig: 1,
+        erklaerung: "AfD-Politiker reden von 'Bio-Deutschen' die angeblich benachteiligt sind.",
+        quelle: "AfD Reden Bundestag 2023"
+    },
+    {
+        text: "Wer hat Bücher verbrannt?",
+        optionen: ["NSDAP", "AfD"],
+        richtig: 0,
+        erklaerung: "Die Nazis haben am 10. Mai 1933 Bücher verbrannt.",
+        quelle: "Bücherverbrennung 1933"
+    }
+];
+
+let aktuell = 0;
+let punkte = 0;
+
+function zeigeFrage() {
+    const box = document.getElementById('question-box');
+    const q = fragen[aktuell];
+    
+    let html = '<div class="question">';
+    html += '<div class="q-text"><strong>Frage ' + (aktuell+1) + ':</strong> ' + q.text + '</div>';
+    
+    if (q.optionen.length === 2) {
+        html += '<button class="btn-red" onclick="pruefe(0)">' + q.optionen[0] + '</button>';
+        html += '<button class="btn-blue" onclick="pruefe(1)">' + q.optionen[1] + '</button>';
+    } else {
+        html += '<button class="btn-red" onclick="pruefe(0)">' + q.optionen[0] + '</button>';
+        html += '<button class="btn-blue" onclick="pruefe(1)">' + q.optionen[1] + '</button>';
+        html += '<button class="btn-gray" onclick="pruefe(2)">' + q.optionen[2] + '</button>';
+    }
+    
+    html += '<div id="res" class="result">';
+    html += '<div id="res-title" style="font-weight: bold;"></div>';
+    html += '<div id="res-text"></div>';
+    html += '</div>';
+    html += '</div>';
+    
+    box.innerHTML = html;
+}
+
+function pruefe(antwort) {
+    const q = fragen[aktuell];
+    const res = document.getElementById('res');
+    const title = document.getElementById('res-title');
+    const text = document.getElementById('res-text');
+    
+    // buttons deaktivieren
+    const buttons = document.getElementsByTagName('button');
+    for(let i=0; i<buttons.length; i++) {
+        buttons[i].disabled = true;
+    }
+    
+    res.style.display = 'block';
+    
+    if (antwort === q.richtig) {
+        res.className = 'result ok';
+        title.innerHTML = 'Richtig!';
+        punkte++;
+    } else {
+        res.className = 'result bad';
+        title.innerHTML = 'Falsch!';
+    }
+    
+    text.innerHTML = q.erklaerung + '<br><em>Quelle: ' + q.quelle + '</em>';
+    
+    // nächste Frage oder Ende
+    setTimeout(function() {
+        aktuell++;
+        if (aktuell < fragen.length) {
+            zeigeFrage();
+        } else {
+            document.getElementById('question-box').style.display = 'none';
+            document.getElementById('end-box').style.display = 'block';
+            document.getElementById('score').innerText = punkte;
+        }
+    }, 3000);
+}
+
+function zeigeQuellen() {
+    document.getElementById('quiz-page').style.display = 'none';
+    document.getElementById('sources-page').style.display = 'block';
+}
+
+function zurueck() {
+    document.getElementById('sources-page').style.display = 'none';
+    document.getElementById('quiz-page').style.display = 'block';
+}
+
+function neustart() {
+    aktuell = 0;
+    punkte = 0;
+    document.getElementById('end-box').style.display = 'none';
+    document.getElementById('question-box').style.display = 'block';
+    zeigeFrage();
+}
+
+// Start
+zeigeFrage();
+</script>
+
 </body>
-
 </html>
-
-
-
-
-
-
